@@ -43,11 +43,11 @@ jobs:
       # ==========================================
       - name: Check Web Files
         run: |
-          echo "===== WEB FILES ====="
+          echo "=========================================="
+          echo "CHECKING WEB FILES"
+          echo "=========================================="
 
           find www -maxdepth 3 -type f | sort
-
-          echo "===== CHECK INDEX.HTML ====="
 
           if [ ! -f "www/index.html" ]; then
             echo "❌ ERROR: www/index.html not found!"
@@ -58,7 +58,25 @@ jobs:
 
 
       # ==========================================
-      # 5. Create package.json
+      # 5. Check App Icon
+      # ==========================================
+      - name: Check App Icon
+        run: |
+          echo "=========================================="
+          echo "CHECKING APP ICON"
+          echo "=========================================="
+
+          if [ ! -f "assets/mknote-icon.png" ]; then
+            echo "❌ ERROR: assets/mknote-icon.png not found!"
+            exit 1
+          fi
+
+          echo "✅ assets/mknote-icon.png found!"
+          file assets/mknote-icon.png
+
+
+      # ==========================================
+      # 6. Create package.json
       # ==========================================
       - name: Create package.json
         run: |
@@ -68,7 +86,7 @@ jobs:
 
 
       # ==========================================
-      # 6. Install Capacitor
+      # 7. Install Capacitor
       # ==========================================
       - name: Install Capacitor
         run: |
@@ -76,7 +94,7 @@ jobs:
 
 
       # ==========================================
-      # 7. Initialize Capacitor
+      # 8. Initialize Capacitor
       # ==========================================
       - name: Initialize Capacitor
         run: |
@@ -84,7 +102,7 @@ jobs:
 
 
       # ==========================================
-      # 8. Add Android
+      # 9. Add Android Platform
       # ==========================================
       - name: Add Android Platform
         run: |
@@ -92,7 +110,75 @@ jobs:
 
 
       # ==========================================
-      # 9. Sync Android
+      # 10. Install Pillow
+      # ==========================================
+      - name: Install Pillow
+        run: |
+          python3 -m pip install pillow
+
+
+      # ==========================================
+      # 11. Generate Android App Icons
+      # ==========================================
+      - name: Generate Android App Icons
+        run: |
+          python3 - <<'PY'
+          from PIL import Image
+          import os
+
+          source = "assets/mknote-icon.png"
+
+          print("==========================================")
+          print("GENERATING MK NOTE APP ICON")
+          print("==========================================")
+
+          if not os.path.exists(source):
+              raise FileNotFoundError(
+                  "❌ assets/mknote-icon.png not found!"
+              )
+
+          img = Image.open(source).convert("RGBA")
+
+          sizes = {
+              "mipmap-mdpi": 48,
+              "mipmap-hdpi": 72,
+              "mipmap-xhdpi": 96,
+              "mipmap-xxhdpi": 144,
+              "mipmap-xxxhdpi": 192
+          }
+
+          base = "android/app/src/main/res"
+
+          for folder, size in sizes.items():
+
+              path = os.path.join(base, folder)
+              os.makedirs(path, exist_ok=True)
+
+              resized = img.resize(
+                  (size, size),
+                  Image.Resampling.LANCZOS
+              )
+
+              resized.save(
+                  os.path.join(path, "ic_launcher.png"),
+                  "PNG"
+              )
+
+              resized.save(
+                  os.path.join(path, "ic_launcher_round.png"),
+                  "PNG"
+              )
+
+              print(f"✅ {folder} -> {size}x{size}")
+
+          print("==========================================")
+          print("✅ APP ICON GENERATED SUCCESSFULLY")
+          print("==========================================")
+          PY
+
+
+      # ==========================================
+      # 12. Sync Android
       # ==========================================
       - name: Sync Android
         run: |
@@ -100,7 +186,7 @@ jobs:
 
 
       # ==========================================
-      # 10. Fix Kotlin Duplicate Classes
+      # 13. Fix Kotlin Duplicate Classes
       # ==========================================
       - name: Fix Kotlin Dependencies
         run: |
@@ -125,7 +211,7 @@ jobs:
 
 
       # ==========================================
-      # 11. Clean Gradle
+      # 14. Clean Gradle
       # ==========================================
       - name: Clean Gradle
         run: |
@@ -135,7 +221,7 @@ jobs:
 
 
       # ==========================================
-      # 12. Build APK
+      # 15. Build APK
       # ==========================================
       - name: Build Debug APK
         run: |
@@ -145,7 +231,7 @@ jobs:
 
 
       # ==========================================
-      # 13. Upload APK
+      # 16. Upload APK
       # ==========================================
       - name: Upload APK
         uses: actions/upload-artifact@v4
