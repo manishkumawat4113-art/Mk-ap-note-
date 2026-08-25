@@ -12,25 +12,25 @@ jobs:
 
     steps:
 
-      # ==========================================
-      # 1. GitHub Repository
-      # ==========================================
+      # ==============================
+      # 1. Checkout
+      # ==============================
       - name: Checkout Repository
         uses: actions/checkout@v4
 
 
-      # ==========================================
-      # 2. Node.js
-      # ==========================================
+      # ==============================
+      # 2. Setup Node.js
+      # ==============================
       - name: Setup Node.js
         uses: actions/setup-node@v4
         with:
           node-version: 20
 
 
-      # ==========================================
-      # 3. Java
-      # ==========================================
+      # ==============================
+      # 3. Setup Java
+      # ==============================
       - name: Setup Java
         uses: actions/setup-java@v4
         with:
@@ -38,21 +38,27 @@ jobs:
           java-version: 21
 
 
-      # ==========================================
-      # 4. Check Repository
-      # ==========================================
-      - name: Check Repository Files
+      # ==============================
+      # 4. Check WWW
+      # ==============================
+      - name: Check Web Files
         run: |
-          echo "================================"
-          echo "REPOSITORY FILES"
-          echo "================================"
+          echo "===== WWW FILES ====="
+          find www -maxdepth 3 -type f | sort
 
-          find . -maxdepth 3 -type f | sort
+          echo "===== CHECK INDEX ====="
+
+          if [ ! -f "www/index.html" ]; then
+            echo "❌ ERROR: www/index.html not found!"
+            exit 1
+          fi
+
+          echo "✅ www/index.html found!"
 
 
-      # ==========================================
+      # ==============================
       # 5. Create package.json
-      # ==========================================
+      # ==============================
       - name: Create package.json
         run: |
           if [ ! -f package.json ]; then
@@ -60,55 +66,56 @@ jobs:
           fi
 
 
-      # ==========================================
+      # ==============================
       # 6. Install Capacitor
-      # ==========================================
+      # ==============================
       - name: Install Capacitor
         run: |
           npm install @capacitor/core @capacitor/cli @capacitor/android
 
 
-      # ==========================================
-      # 7. Create WWW Folder
-      # ==========================================
-      - name: Prepare Web App
+      # ==============================
+      # 7. Initialize Capacitor
+      # ==============================
+      - name: Initialize Capacitor
         run: |
-
-          echo "Creating www folder..."
-
-          rm -rf www
-          mkdir -p www
+          npx cap init "MK AP Note" "com.mk.apnote" --web-dir www
 
 
-          # ----------------------------------------
-          # Find HTML file
-          # ----------------------------------------
-
-          if [ -f "index.html" ]; then
-
-            echo "✅ index.html found"
-
-            cp "index.html" "www/index.html"
-
-          else
-
-            echo "❌ index.html NOT found"
-
-            echo "Searching for HTML files..."
-
-            find . -maxdepth 2 -type f -iname "*.html"
-
-            exit 1
-
-          fi
+      # ==============================
+      # 8. Add Android
+      # ==============================
+      - name: Add Android
+        run: |
+          npx cap add android
 
 
-          # ----------------------------------------
-          # Copy CSS
-          # ----------------------------------------
+      # ==============================
+      # 9. Sync
+      # ==============================
+      - name: Sync Android
+        run: |
+          npx cap sync android
 
-          find . -maxdepth 1 -type f -name "*.css" -exec cp {} www/ \;
 
+      # ==============================
+      # 10. Build APK
+      # ==============================
+      - name: Build Debug APK
+        run: |
+          cd android
+          chmod +x gradlew
+          ./gradlew assembleDebug
+
+
+      # ==============================
+      # 11. Upload APK
+      # ==============================
+      - name: Upload APK
+        uses: actions/upload-artifact@v4
+        with:
+          name: MK-AP-Note-APK
+          path: android/app/build/outputs/apk/debug/app-debug.apk
 
           # ----------------------------------------
           # Copy JavaScript
