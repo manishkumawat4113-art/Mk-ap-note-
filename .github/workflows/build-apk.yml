@@ -12,25 +12,25 @@ jobs:
 
     steps:
 
-      # ==============================
-      # 1. Checkout
-      # ==============================
+      # ==========================================
+      # 1. Checkout Repository
+      # ==========================================
       - name: Checkout Repository
         uses: actions/checkout@v4
 
 
-      # ==============================
+      # ==========================================
       # 2. Setup Node.js
-      # ==============================
+      # ==========================================
       - name: Setup Node.js
         uses: actions/setup-node@v4
         with:
           node-version: 20
 
 
-      # ==============================
+      # ==========================================
       # 3. Setup Java
-      # ==============================
+      # ==========================================
       - name: Setup Java
         uses: actions/setup-java@v4
         with:
@@ -38,15 +38,16 @@ jobs:
           java-version: 21
 
 
-      # ==============================
-      # 4. Check WWW
-      # ==============================
+      # ==========================================
+      # 4. Check Web Files
+      # ==========================================
       - name: Check Web Files
         run: |
-          echo "===== WWW FILES ====="
+          echo "===== WEB FILES ====="
+
           find www -maxdepth 3 -type f | sort
 
-          echo "===== CHECK INDEX ====="
+          echo "===== CHECK INDEX.HTML ====="
 
           if [ ! -f "www/index.html" ]; then
             echo "❌ ERROR: www/index.html not found!"
@@ -56,9 +57,9 @@ jobs:
           echo "✅ www/index.html found!"
 
 
-      # ==============================
+      # ==========================================
       # 5. Create package.json
-      # ==============================
+      # ==========================================
       - name: Create package.json
         run: |
           if [ ! -f package.json ]; then
@@ -66,41 +67,76 @@ jobs:
           fi
 
 
-      # ==============================
+      # ==========================================
       # 6. Install Capacitor
-      # ==============================
+      # ==========================================
       - name: Install Capacitor
         run: |
           npm install @capacitor/core @capacitor/cli @capacitor/android
 
 
-      # ==============================
+      # ==========================================
       # 7. Initialize Capacitor
-      # ==============================
+      # ==========================================
       - name: Initialize Capacitor
         run: |
           npx cap init "MK AP Note" "com.mk.apnote" --web-dir www
 
 
-      # ==============================
+      # ==========================================
       # 8. Add Android
-      # ==============================
-      - name: Add Android
+      # ==========================================
+      - name: Add Android Platform
         run: |
           npx cap add android
 
 
-      # ==============================
-      # 9. Sync
-      # ==============================
+      # ==========================================
+      # 9. Sync Android
+      # ==========================================
       - name: Sync Android
         run: |
           npx cap sync android
 
 
-      # ==============================
-      # 10. Build APK
-      # ==============================
+      # ==========================================
+      # 10. Fix Kotlin Duplicate Classes
+      # ==========================================
+      - name: Fix Kotlin Dependencies
+        run: |
+
+          cat >> android/app/build.gradle <<'EOF'
+
+          configurations.all {
+              resolutionStrategy.eachDependency { details ->
+                  if (details.requested.group == "org.jetbrains.kotlin") {
+                      details.useVersion "1.8.22"
+                  }
+              }
+
+              resolutionStrategy.force(
+                  "org.jetbrains.kotlin:kotlin-stdlib:1.8.22",
+                  "org.jetbrains.kotlin:kotlin-stdlib-jdk7:1.8.22",
+                  "org.jetbrains.kotlin:kotlin-stdlib-jdk8:1.8.22"
+              )
+          }
+
+          EOF
+
+
+      # ==========================================
+      # 11. Clean Gradle
+      # ==========================================
+      - name: Clean Gradle
+        run: |
+          cd android
+          chmod +x gradlew
+          ./gradlew clean
+
+
+      # ==========================================
+      # 12. Build APK
+      # ==========================================
       - name: Build Debug APK
         run: |
           cd android
@@ -108,9 +144,9 @@ jobs:
           ./gradlew assembleDebug
 
 
-      # ==============================
-      # 11. Upload APK
-      # ==============================
+      # ==========================================
+      # 13. Upload APK
+      # ==========================================
       - name: Upload APK
         uses: actions/upload-artifact@v4
         with:
