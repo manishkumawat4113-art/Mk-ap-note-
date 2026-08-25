@@ -1,0 +1,85 @@
+name: Build Android APK
+
+on:
+  workflow_dispatch:
+  push:
+    branches:
+      - main
+
+jobs:
+  build-apk:
+    runs-on: ubuntu-latest
+
+    steps:
+      # 1. GitHub repository checkout
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      # 2. Node.js setup
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+
+      # 3. Java setup
+      - name: Setup Java
+        uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: 21
+
+      # 4. Create package.json if it doesn't exist
+      - name: Create package.json
+        run: |
+          if [ ! -f package.json ]; then
+            npm init -y
+          fi
+
+      # 5. Install Capacitor
+      - name: Install Capacitor
+        run: |
+          npm install @capacitor/core @capacitor/cli @capacitor/android
+
+      # 6. Create www folder
+      - name: Prepare web files
+        run: |
+          rm -rf www
+          mkdir www
+
+          cp *.html www/ 2>/dev/null || true
+          cp *.css www/ 2>/dev/null || true
+          cp *.js www/ 2>/dev/null || true
+
+          cp -r images www/ 2>/dev/null || true
+          cp -r assets www/ 2>/dev/null || true
+          cp -r css www/ 2>/dev/null || true
+          cp -r js www/ 2>/dev/null || true
+
+      # 7. Initialize Capacitor
+      - name: Initialize Capacitor
+        run: |
+          npx cap init "MK App" "com.mk.app" --web-dir www
+
+      # 8. Add Android platform
+      - name: Add Android
+        run: |
+          npx cap add android
+
+      # 9. Copy web files into Android project
+      - name: Capacitor sync
+        run: |
+          npx cap sync android
+
+      # 10. Build APK
+      - name: Build Debug APK
+        run: |
+          cd android
+          chmod +x gradlew
+          ./gradlew assembleDebug
+
+      # 11. Upload APK
+      - name: Upload APK
+        uses: actions/upload-artifact@v4
+        with:
+          name: MK-App-APK
+          path: android/app/build/outputs/apk/debug/app-debug.apk
