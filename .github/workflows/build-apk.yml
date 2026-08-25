@@ -1,4 +1,5 @@
 name: Build Android APK
+
 on:
   workflow_dispatch:
   push:
@@ -10,75 +11,206 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-      # 1. GitHub repository checkout
-      - name: Checkout repository
+
+      # ==========================================
+      # 1. GitHub Repository
+      # ==========================================
+      - name: Checkout Repository
         uses: actions/checkout@v4
 
-      # 2. Node.js setup
+
+      # ==========================================
+      # 2. Node.js
+      # ==========================================
       - name: Setup Node.js
         uses: actions/setup-node@v4
         with:
           node-version: 20
 
-      # 3. Java setup
+
+      # ==========================================
+      # 3. Java
+      # ==========================================
       - name: Setup Java
         uses: actions/setup-java@v4
         with:
           distribution: temurin
           java-version: 21
 
-      # 4. Create package.json if it doesn't exist
+
+      # ==========================================
+      # 4. Check Repository
+      # ==========================================
+      - name: Check Repository Files
+        run: |
+          echo "================================"
+          echo "REPOSITORY FILES"
+          echo "================================"
+
+          find . -maxdepth 3 -type f | sort
+
+
+      # ==========================================
+      # 5. Create package.json
+      # ==========================================
       - name: Create package.json
         run: |
           if [ ! -f package.json ]; then
             npm init -y
           fi
 
-      # 5. Install Capacitor
+
+      # ==========================================
+      # 6. Install Capacitor
+      # ==========================================
       - name: Install Capacitor
         run: |
           npm install @capacitor/core @capacitor/cli @capacitor/android
 
-      # 6. Create www folder
-      - name: Prepare web files
-        run: |
-          rm -rf www
-          mkdir www
 
-          cp *.html www/ 2>/dev/null || true
-          cp *.css www/ 2>/dev/null || true
-          cp *.js www/ 2>/dev/null || true
+      # ==========================================
+      # 7. Create WWW Folder
+      # ==========================================
+      - name: Prepare Web App
+        run: |
+
+          echo "Creating www folder..."
+
+          rm -rf www
+          mkdir -p www
+
+
+          # ----------------------------------------
+          # Find HTML file
+          # ----------------------------------------
+
+          if [ -f "index.html" ]; then
+
+            echo "✅ index.html found"
+
+            cp "index.html" "www/index.html"
+
+          else
+
+            echo "❌ index.html NOT found"
+
+            echo "Searching for HTML files..."
+
+            find . -maxdepth 2 -type f -iname "*.html"
+
+            exit 1
+
+          fi
+
+
+          # ----------------------------------------
+          # Copy CSS
+          # ----------------------------------------
+
+          find . -maxdepth 1 -type f -name "*.css" -exec cp {} www/ \;
+
+
+          # ----------------------------------------
+          # Copy JavaScript
+          # ----------------------------------------
+
+          find . -maxdepth 1 -type f -name "*.js" \
+            ! -name "package-lock.json" \
+            -exec cp {} www/ \;
+
+
+          # ----------------------------------------
+          # Copy folders
+          # ----------------------------------------
 
           cp -r images www/ 2>/dev/null || true
           cp -r assets www/ 2>/dev/null || true
           cp -r css www/ 2>/dev/null || true
           cp -r js www/ 2>/dev/null || true
 
-      # 7. Initialize Capacitor
+
+          # ----------------------------------------
+          # FINAL CHECK
+          # ----------------------------------------
+
+          echo "================================"
+          echo "WWW CONTENT"
+          echo "================================"
+
+          find www -maxdepth 3 -type f | sort
+
+
+          echo "================================"
+          echo "CHECKING INDEX.HTML"
+          echo "================================"
+
+          if [ ! -f "www/index.html" ]; then
+            echo "❌ www/index.html NOT FOUND"
+            exit 1
+          fi
+
+          echo "✅ www/index.html EXISTS"
+
+
+      # ==========================================
+      # 8. Initialize Capacitor
+      # ==========================================
       - name: Initialize Capacitor
         run: |
-          npx cap init "MK App" "com.mk.app" --web-dir www
+          npx cap init "MK AP Note" "com.mk.apnote" --web-dir www
 
-      # 8. Add Android platform
-      - name: Add Android
+
+      # ==========================================
+      # 9. Verify Capacitor Config
+      # ==========================================
+      - name: Verify Capacitor
+        run: |
+          echo "================================"
+          echo "CAPACITOR CONFIG"
+          echo "================================"
+
+          cat capacitor.config.json
+
+          echo "================================"
+          echo "WWW INDEX"
+          echo "================================"
+
+          ls -lah www/index.html
+
+
+      # ==========================================
+      # 10. Add Android
+      # ==========================================
+      - name: Add Android Platform
         run: |
           npx cap add android
 
-      # 9. Copy web files into Android project
-      - name: Capacitor sync
+
+      # ==========================================
+      # 11. Sync Android
+      # ==========================================
+      - name: Sync Android
         run: |
           npx cap sync android
 
-      # 10. Build APK
+
+      # ==========================================
+      # 12. Build APK
+      # ==========================================
       - name: Build Debug APK
         run: |
           cd android
+
           chmod +x gradlew
+
           ./gradlew assembleDebug
 
-      # 11. Upload APK
+
+      # ==========================================
+      # 13. Upload APK
+      # ==========================================
       - name: Upload APK
         uses: actions/upload-artifact@v4
         with:
-          name: MK-App-APK
+          name: MK-AP-Note-APK
           path: android/app/build/outputs/apk/debug/app-debug.apk
