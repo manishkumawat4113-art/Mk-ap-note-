@@ -43,10 +43,7 @@ jobs:
       # ==========================================
       - name: Check Web Files
         run: |
-          echo "=========================================="
-          echo "CHECKING WEB FILES"
-          echo "=========================================="
-
+          echo "===== WEB FILES ====="
           find www -maxdepth 3 -type f | sort
 
           if [ ! -f "www/index.html" ]; then
@@ -54,7 +51,7 @@ jobs:
             exit 1
           fi
 
-          echo "✅ www/index.html found!"
+          echo "✅ www/index.html found"
 
 
       # ==========================================
@@ -62,17 +59,12 @@ jobs:
       # ==========================================
       - name: Check App Icon
         run: |
-          echo "=========================================="
-          echo "CHECKING APP ICON"
-          echo "=========================================="
-
           if [ ! -f "assets/mknote-icon.png" ]; then
             echo "❌ ERROR: assets/mknote-icon.png not found!"
             exit 1
           fi
 
-          echo "✅ assets/mknote-icon.png found!"
-          file assets/mknote-icon.png
+          echo "✅ assets/mknote-icon.png found"
 
 
       # ==========================================
@@ -98,11 +90,11 @@ jobs:
       # ==========================================
       - name: Initialize Capacitor
         run: |
-          npx cap init "MK AP Note" "com.mk.apnote" --web-dir www
+          npx cap init "MK Note" "com.mk.apnote" --web-dir www
 
 
       # ==========================================
-      # 9. Add Android Platform
+      # 9. Add Android
       # ==========================================
       - name: Add Android Platform
         run: |
@@ -118,9 +110,9 @@ jobs:
 
 
       # ==========================================
-      # 11. Generate Android App Icons
+      # 11. Generate Android Launcher Icons
       # ==========================================
-      - name: Generate Android App Icons
+      - name: Generate Android Launcher Icons
         run: |
           python3 - <<'PY'
           from PIL import Image
@@ -128,16 +120,13 @@ jobs:
 
           source = "assets/mknote-icon.png"
 
-          print("==========================================")
-          print("GENERATING MK NOTE APP ICON")
-          print("==========================================")
-
-          if not os.path.exists(source):
-              raise FileNotFoundError(
-                  "❌ assets/mknote-icon.png not found!"
-              )
-
           img = Image.open(source).convert("RGBA")
+
+          res = "android/app/src/main/res"
+
+          # ------------------------------------------
+          # Normal Android launcher icon sizes
+          # ------------------------------------------
 
           sizes = {
               "mipmap-mdpi": 48,
@@ -147,38 +136,99 @@ jobs:
               "mipmap-xxxhdpi": 192
           }
 
-          base = "android/app/src/main/res"
-
           for folder, size in sizes.items():
 
-              path = os.path.join(base, folder)
+              path = os.path.join(res, folder)
               os.makedirs(path, exist_ok=True)
 
-              resized = img.resize(
+              icon = img.resize(
                   (size, size),
                   Image.Resampling.LANCZOS
               )
 
-              resized.save(
+              icon.save(
                   os.path.join(path, "ic_launcher.png"),
                   "PNG"
               )
 
-              resized.save(
+              icon.save(
                   os.path.join(path, "ic_launcher_round.png"),
                   "PNG"
               )
 
-              print(f"✅ {folder} -> {size}x{size}")
+          # ------------------------------------------
+          # Adaptive icon foreground
+          # ------------------------------------------
 
-          print("==========================================")
-          print("✅ APP ICON GENERATED SUCCESSFULLY")
-          print("==========================================")
+          foreground_path = os.path.join(
+              res,
+              "drawable-nodpi"
+          )
+
+          os.makedirs(foreground_path, exist_ok=True)
+
+          # 432x432 adaptive foreground
+          foreground = img.resize(
+              (432, 432),
+              Image.Resampling.LANCZOS
+          )
+
+          foreground.save(
+              os.path.join(
+                  foreground_path,
+                  "mknote_icon_foreground.png"
+              ),
+              "PNG"
+          )
+
+          print("✅ Launcher icons generated")
           PY
 
 
       # ==========================================
-      # 12. Sync Android
+      # 12. Create Adaptive Icon Resources
+      # ==========================================
+      - name: Create Adaptive Launcher Icons
+        run: |
+
+          mkdir -p android/app/src/main/res/mipmap-anydpi-v26
+
+          cat > android/app/src/main/res/mipmap-anydpi-v26/ic_launcher.xml <<'EOF'
+          <?xml version="1.0" encoding="utf-8"?>
+          <adaptive-icon xmlns:android="http://schemas.android.com/apk/res/android">
+              <background android:drawable="@color/mknote_icon_background"/>
+              <foreground android:drawable="@drawable/mknote_icon_foreground"/>
+          </adaptive-icon>
+          EOF
+
+
+          cat > android/app/src/main/res/mipmap-anydpi-v26/ic_launcher_round.xml <<'EOF'
+          <?xml version="1.0" encoding="utf-8"?>
+          <adaptive-icon xmlns:android="http://schemas.android.com/apk/res/android">
+              <background android:drawable="@color/mknote_icon_background"/>
+              <foreground android:drawable="@drawable/mknote_icon_foreground"/>
+          </adaptive-icon>
+          EOF
+
+
+      # ==========================================
+      # 13. Create Icon Background Color
+      # ==========================================
+      - name: Create Icon Background
+        run: |
+
+          mkdir -p android/app/src/main/res/values
+
+          cat > android/app/src/main/res/values/mknote_icon_colors.xml <<'EOF'
+          <?xml version="1.0" encoding="utf-8"?>
+          <resources>
+              <color name="mknote_icon_background">#FFFFFF</color>
+          </resources>
+          EOF
+
+
+      # ==========================================
+      # 14. Sync Capacitor
       # ==========================================
       - name: Sync Android
         run: |
@@ -186,7 +236,7 @@ jobs:
 
 
       # ==========================================
-      # 13. Fix Kotlin Duplicate Classes
+      # 15. Fix Kotlin Duplicate Classes
       # ==========================================
       - name: Fix Kotlin Dependencies
         run: |
@@ -211,7 +261,7 @@ jobs:
 
 
       # ==========================================
-      # 14. Clean Gradle
+      # 16. Clean Gradle
       # ==========================================
       - name: Clean Gradle
         run: |
@@ -221,7 +271,7 @@ jobs:
 
 
       # ==========================================
-      # 15. Build APK
+      # 17. Build APK
       # ==========================================
       - name: Build Debug APK
         run: |
@@ -231,10 +281,10 @@ jobs:
 
 
       # ==========================================
-      # 16. Upload APK
+      # 18. Upload APK
       # ==========================================
       - name: Upload APK
         uses: actions/upload-artifact@v4
         with:
-          name: MK-AP-Note-APK
+          name: MK-Note-APK
           path: android/app/build/outputs/apk/debug/app-debug.apk
