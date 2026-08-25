@@ -1,0 +1,284 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+
+    <meta charset="UTF-8">
+
+    <meta
+        name="viewport"
+        content="width=device-width, initial-scale=1.0"
+    >
+
+    <title>MK Notes</title>
+
+    <link rel="stylesheet" href="styles.css">
+
+</head>
+
+<body>
+
+    <main class="app">
+
+        <!-- HEADER -->
+
+        <header class="header">
+
+            <div>
+
+                <h1>My Notes</h1>
+
+                <p>
+                    Save your ideas and important notes
+                </p>
+
+            </div>
+
+            <button
+                id="themeBtn"
+                type="button"
+            >
+                🌙
+            </button>
+
+        </header>
+
+
+        <!-- SEARCH -->
+
+        <div class="search-box">
+
+            <input
+                id="searchInput"
+                type="search"
+                placeholder="Search notes..."
+                autocomplete="off"
+            >
+
+        </div>
+
+
+        <!-- CATEGORY FILTER -->
+
+        <div class="filters">
+
+            <button
+                class="filter active"
+                data-category="all"
+                type="button"
+            >
+                All
+            </button>
+
+            <button
+                class="filter"
+                data-category="Study"
+                type="button"
+            >
+                Study
+            </button>
+
+            <button
+                class="filter"
+                data-category="Personal"
+                type="button"
+            >
+                Personal
+            </button>
+
+            <button
+                class="filter"
+                data-category="Work"
+                type="button"
+            >
+                Work
+            </button>
+
+        </div>
+
+
+        <!-- ADD NOTE BUTTON -->
+
+        <button
+            id="addNoteBtn"
+            type="button"
+        >
+            + New Note
+        </button>
+
+
+        <!-- NOTES -->
+
+        <section id="notesContainer"></section>
+
+
+        <!-- EMPTY MESSAGE -->
+
+        <p
+            id="emptyMessage"
+            class="empty-message"
+        >
+            No notes found.
+        </p>
+
+
+        <!-- STATS -->
+
+        <div class="stats">
+
+            <span>
+                Total:
+                <strong id="totalCount">0</strong>
+            </span>
+
+            <span>
+                Pinned:
+                <strong id="pinnedCount">0</strong>
+            </span>
+
+        </div>
+
+
+        <!-- DELETE ALL -->
+
+        <button
+            id="deleteAllBtn"
+            onclick="deleteAllBtn()"
+            type="button"
+        >
+            Delete All Notes
+        </button>
+
+    </main>
+
+
+    <!-- ==========================
+         NOTE MODAL
+    =========================== -->
+
+    <div
+        id="noteModal"
+        class="modal hidden"
+    >
+
+        <div class="modal-content">
+
+            <div class="modal-header">
+
+                <h2 id="modalTitle">
+                    New Note
+                </h2>
+
+                <button
+                    id="closeModalBtn"
+                    type="button"
+                >
+                    ×
+                </button>
+
+            </div>
+
+
+            <!-- NOTE FORM -->
+
+            <form id="noteForm">
+
+                <input
+                    id="noteTitle"
+                    type="text"
+                    placeholder="Note title..."
+                    autocomplete="off"
+                >
+
+
+                <textarea
+                    id="noteContent"
+                    placeholder="Write your note..."
+                    rows="8"
+                ></textarea>
+
+
+                <select id="categoryInput">
+
+                    <option value="Study">
+                        Study
+                    </option>
+
+                    <option value="Personal">
+                        Personal
+                    </option>
+
+                    <option value="Work">
+                        Work
+                    </option>
+
+                </select>
+
+
+                <div class="color-options">
+
+                    <label>
+                        <input
+                            type="radio"
+                            name="noteColor"
+                            value="yellow"
+                            checked
+                        >
+                        Yellow
+                    </label>
+
+
+                    <label>
+                        <input
+                            type="radio"
+                            name="noteColor"
+                            value="blue"
+                        >
+                        Blue
+                    </label>
+
+
+                    <label>
+                        <input
+                            type="radio"
+                            name="noteColor"
+                            value="green"
+                        >
+                        Green
+                    </label>
+
+
+                    <label>
+                        <input
+                            type="radio"
+                            name="noteColor"
+                            value="pink"
+                        >
+                        Pink
+                    </label>
+
+                </div>
+
+
+                <button
+                    type="submit"
+                    id="saveNoteBtn"
+                >
+                    Save Note
+                </button>
+
+            </form>
+
+        </div>
+
+    </div>
+
+
+    <script
+        src="script.js"
+        defer
+    ></script>
+
+</body>
+
+</html>
