@@ -735,22 +735,29 @@ body.dark {
 
 }
 
-body.dark .note-card.yellow {
+body.dark .note-yellow {
     background: #4a4520;
+   color: #f9fafb;
 }
 
-body.dark .note-card.blue {
+body.dark .note-blue {
     background: #1e3a5f;
+   color: #f9fafb;
 }
 
-body.dark .note-card.green {
+body.dark .note-green {
     background: #1f4a2a;
+   color: #f9fafb;
 }
 
-body.dark .note-card.pink {
+body.dark .note-pink {
     background: #51263a;
+   color: #f9fafb;
 }
 
-body.dark .note-card {
-    color: #f9fafb;
-}
+
+
+
+
+
+
