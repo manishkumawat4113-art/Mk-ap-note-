@@ -267,7 +267,6 @@ button:active {
 /* ==========================================
    13. NOTE CARD
 ========================================== */
-
 .note-card {
     position: relative;
 
@@ -283,6 +282,9 @@ button:active {
     transition:
         transform 0.2s,
         box-shadow 0.2s;
+
+    display: flex;
+    flex-direction: column;
 }
 
 
@@ -367,16 +369,7 @@ button:active {
 /* ==========================================
    17. NOTE FOOTER
 ========================================== */
-
 .note-footer {
-    position: absolute;
-
-    left: 18px;
-
-    right: 18px;
-
-    bottom: 15px;
-
     display: flex;
 
     justify-content: space-between;
@@ -384,6 +377,8 @@ button:active {
     align-items: center;
 
     gap: 8px;
+
+    margin-top: 15px;
 }
 
 
@@ -738,4 +733,24 @@ body.dark {
         padding: 18px;
     }
 
+}
+
+body.dark .note-card.yellow {
+    background: #4a4520;
+}
+
+body.dark .note-card.blue {
+    background: #1e3a5f;
+}
+
+body.dark .note-card.green {
+    background: #1f4a2a;
+}
+
+body.dark .note-card.pink {
+    background: #51263a;
+}
+
+body.dark .note-card {
+    color: #f9fafb;
 }
