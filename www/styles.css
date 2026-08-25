@@ -1,0 +1,741 @@
+/* ==========================================
+   1. RESET
+========================================== */
+
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+
+/* ==========================================
+   2. CSS VARIABLES
+========================================== */
+
+:root {
+    --bg: #f4f5f7;
+    --card: #ffffff;
+    --text: #222222;
+    --muted: #777777;
+    --border: #dddddd;
+    --primary: #2563eb;
+    --danger: #dc2626;
+    --shadow: rgba(0, 0, 0, 0.08);
+}
+
+
+/* ==========================================
+   3. BODY
+========================================== */
+
+body {
+    min-height: 100vh;
+
+    padding: 30px 15px;
+
+    background: var(--bg);
+
+    color: var(--text);
+
+    font-family: Arial, sans-serif;
+
+    transition:
+        background 0.3s,
+        color 0.3s;
+}
+
+
+/* ==========================================
+   4. MAIN APP
+========================================== */
+
+.app {
+    width: 100%;
+    max-width: 1000px;
+
+    margin: auto;
+
+    padding: 25px;
+
+    background: var(--card);
+
+    border-radius: 20px;
+
+    box-shadow:
+        0 10px 30px var(--shadow);
+}
+
+
+/* ==========================================
+   5. HEADER
+========================================== */
+
+.header {
+    display: flex;
+
+    justify-content: space-between;
+
+    align-items: center;
+
+    gap: 15px;
+
+    margin-bottom: 25px;
+}
+
+
+.header h1 {
+    margin-bottom: 5px;
+
+    font-size: 30px;
+}
+
+
+.header p {
+    color: var(--muted);
+
+    font-size: 14px;
+}
+
+
+/* ==========================================
+   6. THEME BUTTON
+========================================== */
+
+#themeBtn {
+    width: 45px;
+    height: 45px;
+
+    border: none;
+
+    border-radius: 50%;
+
+    background: var(--border);
+
+    color: var(--text);
+
+    cursor: pointer;
+
+    font-size: 20px;
+}
+
+
+/* ==========================================
+   7. GENERAL INPUTS
+========================================== */
+
+input,
+textarea,
+select {
+    width: 100%;
+
+    padding: 12px;
+
+    border: 1px solid var(--border);
+
+    border-radius: 10px;
+
+    outline: none;
+
+    background: var(--card);
+
+    color: var(--text);
+
+    font-size: 15px;
+}
+
+
+input:focus,
+textarea:focus,
+select:focus {
+    border-color: var(--primary);
+}
+
+
+/* ==========================================
+   8. SEARCH
+========================================== */
+
+.search-box {
+    margin-bottom: 15px;
+}
+
+
+#searchInput {
+    font-size: 16px;
+}
+
+
+/* ==========================================
+   9. FILTERS
+========================================== */
+
+.filters {
+    display: flex;
+
+    flex-wrap: wrap;
+
+    gap: 8px;
+
+    margin-bottom: 20px;
+}
+
+
+.filter {
+    padding: 9px 15px;
+
+    border: none;
+
+    border-radius: 8px;
+
+    background: var(--border);
+
+    color: var(--text);
+
+    cursor: pointer;
+}
+
+
+.filter.active {
+    background: var(--primary);
+
+    color: white;
+}
+
+
+/* ==========================================
+   10. GENERAL BUTTON
+========================================== */
+
+button {
+    border: none;
+
+    border-radius: 10px;
+
+    cursor: pointer;
+
+    transition:
+        transform 0.1s,
+        opacity 0.2s,
+        background 0.2s;
+}
+
+
+button:hover {
+    opacity: 0.9;
+}
+
+
+button:active {
+    transform: scale(0.95);
+}
+
+
+/* ==========================================
+   11. ADD NOTE BUTTON
+========================================== */
+
+#addNoteBtn {
+    width: 100%;
+
+    margin-bottom: 20px;
+
+    padding: 13px;
+
+    background: var(--primary);
+
+    color: white;
+
+    font-size: 16px;
+}
+
+
+/* ==========================================
+   12. NOTES CONTAINER
+========================================== */
+
+#notesContainer {
+    display: grid;
+
+    grid-template-columns:
+        repeat(3, 1fr);
+
+    gap: 15px;
+}
+
+
+/* ==========================================
+   13. NOTE CARD
+========================================== */
+
+.note-card {
+    position: relative;
+
+    min-height: 220px;
+
+    padding: 18px;
+
+    border-radius: 15px;
+
+    box-shadow:
+        0 5px 15px var(--shadow);
+
+    transition:
+        transform 0.2s,
+        box-shadow 0.2s;
+}
+
+
+.note-card:hover {
+    transform: translateY(-4px);
+
+    box-shadow:
+        0 10px 25px var(--shadow);
+}
+
+
+/* ==========================================
+   14. NOTE COLORS
+========================================== */
+
+.note-yellow {
+    background: #fff8b5;
+}
+
+
+.note-blue {
+    background: #dbeafe;
+}
+
+
+.note-green {
+    background: #dcfce7;
+}
+
+
+.note-pink {
+    background: #fce7f3;
+}
+
+
+/* ==========================================
+   15. NOTE HEADER
+========================================== */
+
+.note-header {
+    display: flex;
+
+    justify-content: space-between;
+
+    align-items: flex-start;
+
+    gap: 10px;
+
+    margin-bottom: 12px;
+}
+
+
+.note-title {
+    font-size: 19px;
+
+    font-weight: bold;
+
+    word-break: break-word;
+}
+
+
+.pin-icon {
+    font-size: 18px;
+}
+
+
+/* ==========================================
+   16. NOTE CONTENT
+========================================== */
+
+.note-content {
+    margin-bottom: 15px;
+
+    line-height: 1.5;
+
+    white-space: pre-wrap;
+
+    word-break: break-word;
+}
+
+
+/* ==========================================
+   17. NOTE FOOTER
+========================================== */
+
+.note-footer {
+    position: absolute;
+
+    left: 18px;
+
+    right: 18px;
+
+    bottom: 15px;
+
+    display: flex;
+
+    justify-content: space-between;
+
+    align-items: center;
+
+    gap: 8px;
+}
+
+
+.note-category {
+    padding: 5px 8px;
+
+    border-radius: 6px;
+
+    background: rgba(0, 0, 0, 0.08);
+
+    font-size: 11px;
+
+    font-weight: bold;
+}
+
+
+.note-date {
+    color: var(--muted);
+
+    font-size: 11px;
+}
+
+
+/* ==========================================
+   18. NOTE ACTIONS
+========================================== */
+
+.note-actions {
+    display: flex;
+
+    gap: 5px;
+
+    margin-top: 15px;
+}
+
+
+.note-actions button {
+    padding: 7px 10px;
+
+    color: white;
+
+    font-size: 12px;
+}
+
+
+.edit-note {
+    background: var(--primary);
+}
+
+
+.delete-note {
+    background: var(--danger);
+}
+
+
+.pin-note {
+    background: #555555;
+}
+
+
+/* ==========================================
+   19. EMPTY MESSAGE
+========================================== */
+
+.empty-message {
+    padding: 40px 10px;
+
+    text-align: center;
+
+    color: var(--muted);
+}
+
+
+/* ==========================================
+   20. STATS
+========================================== */
+
+.stats {
+    display: flex;
+
+    justify-content: space-between;
+
+    margin-top: 20px;
+
+    padding: 15px;
+
+    border-radius: 10px;
+
+    background: var(--bg);
+}
+
+
+.stats strong {
+    color: var(--primary);
+}
+
+
+/* ==========================================
+   21. DELETE ALL
+========================================== */
+
+#deleteAllBtn {
+    width: 100%;
+
+    margin-top: 12px;
+
+    padding: 12px;
+
+    background: var(--danger);
+
+    color: white;
+}
+
+
+/* ==========================================
+   22. MODAL
+========================================== */
+
+.modal {
+    position: fixed;
+
+    inset: 0;
+
+    z-index: 1000;
+
+    display: flex;
+
+    justify-content: center;
+
+    align-items: center;
+
+    padding: 20px;
+
+    background: rgba(0, 0, 0, 0.6);
+}
+
+
+/* ==========================================
+   23. HIDDEN
+========================================== */
+
+.hidden {
+    display: none;
+}
+
+
+/* ==========================================
+   24. MODAL CONTENT
+========================================== */
+
+.modal-content {
+    width: 100%;
+
+    max-width: 550px;
+
+    max-height: 90vh;
+
+    overflow-y: auto;
+
+    padding: 22px;
+
+    border-radius: 18px;
+
+    background: var(--card);
+
+    box-shadow:
+        0 20px 50px rgba(0, 0, 0, 0.3);
+
+    animation:
+        modalOpen 0.2s ease;
+}
+
+
+/* ==========================================
+   25. MODAL ANIMATION
+========================================== */
+
+@keyframes modalOpen {
+
+    from {
+        opacity: 0;
+
+        transform: scale(0.9);
+    }
+
+    to {
+        opacity: 1;
+
+        transform: scale(1);
+    }
+
+}
+
+
+/* ==========================================
+   26. MODAL HEADER
+========================================== */
+
+.modal-header {
+    display: flex;
+
+    justify-content: space-between;
+
+    align-items: center;
+
+    margin-bottom: 20px;
+}
+
+
+.modal-header h2 {
+    font-size: 22px;
+}
+
+
+#closeModalBtn {
+    width: 35px;
+    height: 35px;
+
+    background: var(--border);
+
+    color: var(--text);
+
+    font-size: 22px;
+}
+
+
+/* ==========================================
+   27. NOTE FORM
+========================================== */
+
+#noteForm {
+    display: flex;
+
+    flex-direction: column;
+
+    gap: 12px;
+}
+
+
+#noteContent {
+    resize: vertical;
+
+    min-height: 150px;
+}
+
+
+/* ==========================================
+   28. COLOR OPTIONS
+========================================== */
+
+.color-options {
+    display: flex;
+
+    flex-wrap: wrap;
+
+    gap: 12px;
+}
+
+
+.color-options label {
+    display: flex;
+
+    align-items: center;
+
+    gap: 5px;
+
+    cursor: pointer;
+
+    font-size: 13px;
+}
+
+
+/* ==========================================
+   29. SAVE BUTTON
+========================================== */
+
+#saveNoteBtn {
+    padding: 13px;
+
+    background: var(--primary);
+
+    color: white;
+
+    font-size: 15px;
+}
+
+
+/* ==========================================
+   30. DARK MODE
+========================================== */
+
+body.dark {
+    --bg: #111827;
+    --card: #1f2937;
+    --text: #f9fafb;
+    --muted: #9ca3af;
+    --border: #374151;
+}
+
+
+/* ==========================================
+   31. MOBILE
+========================================== */
+
+@media (max-width: 800px) {
+
+    #notesContainer {
+        grid-template-columns:
+            repeat(2, 1fr);
+    }
+
+}
+
+
+@media (max-width: 550px) {
+
+    body {
+        padding: 15px 10px;
+    }
+
+
+    .app {
+        padding: 18px;
+
+        border-radius: 14px;
+    }
+
+
+    .header h1 {
+        font-size: 25px;
+    }
+
+
+    #notesContainer {
+        grid-template-columns: 1fr;
+    }
+
+
+    .stats {
+        flex-direction: column;
+
+        gap: 8px;
+    }
+
+
+    .modal {
+        padding: 10px;
+    }
+
+
+    .modal-content {
+        padding: 18px;
+    }
+
+}
